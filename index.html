@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>حل المعادلات</title>
+  <style>
+    :root{
+      --indigo-600:#4f46e5;
+      --indigo-700:#4338ca;
+      --gray-50:#f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-500:#6b7280;
+      --gray-700:#374151;
+      --gray-800:#1f2937;
+      --emerald-50:#ecfdf5;
+      --emerald-200:#a7f3d0;
+      --emerald-800:#065f46;
+      --amber-50:#fffbeb;
+      --amber-200:#fde68a;
+      --amber-800:#92400e;
+      --rose-50:#fff1f2;
+      --rose-200:#fecdd3;
+      --rose-800:#9f1239;
+      --shadow: 0 10px 20px rgba(0,0,0,.06);
+      --radius-xl: 1rem;
+      --radius-lg: .75rem;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-800);
+    }
+
+    .container{
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .card{
+      background:#fff;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+
+    .header{
+      border-top: 4px solid var(--indigo-600);
+      margin-bottom: 1.5rem;
+    }
+
+    .header h1{
+      margin:0 0 .5rem 0;
+      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+    }
+
+    .badge{
+      background: #e0e7ff;
+      color: #3730a3;
+      font-size: .75rem;
+      padding: .25rem .6rem;
+      border-radius: 999px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .mode-toggle{
+      display:flex;
+      gap:.5rem;
+      background:#fff;
+      padding:.5rem;
+      border-radius: .9rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      margin-bottom: 1.5rem;
+    }
+
+    .mode-btn{
+      flex:1;
+      border: none;
+      padding: .9rem .8rem;
+      border-radius: .7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      background: transparent;
+      color: var(--gray-500);
+    }
+
+    .mode-btn.active{
+      background: var(--indigo-600);
+      color:#fff;
+      box-shadow: 0 6px 12px rgba(79,70,229,.25);
+    }
+
+    .mode-btn small{
+      display:block;
+      font-weight: 400;
+      opacity:.8;
+      margin-top:.25rem;
+      direction:ltr;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:1rem;
+      margin-bottom:1.2rem;
+    }
+
+    @media (max-width: 700px){
+      .form-grid{ grid-template-columns: 1fr; }
+    }
+
+    label{
+      display:block;
+      font-size:.9rem;
+      margin-bottom:.35rem;
+      color: var(--gray-700);
+      font-weight:600;
+    }
+
+    input{
+      width:100%;
+      padding:.8rem;
+      border:1px solid var(--gray-300);
+      border-radius:.7rem;
+      outline: none;
+      transition: .2s;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+      text-align:left;
+      direction:ltr;
+    }
+
+    input:focus{
+      border-color: var(--indigo-600);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+    }
+
+    .error{
+      background: var(--rose-50);
+      color: var(--rose-800);
+      padding:.7rem .9rem;
+      border-radius:.6rem;
+      font-size:.9rem;
+      margin-bottom:1rem;
+      display:flex;
+      align-items:center;
+      gap:.5rem;
+    }
+
+    .actions{
+      display:flex;
+      gap:.6rem;
+    }
+
+    .btn{
+      border:none;
+      padding:.85rem 1rem;
+      border-radius:.7rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+    }
+
+    .btn-primary{
+      flex:1;
+      background: var(--indigo-600);
+      color:#fff;
+    }
+    .btn-primary:hover{ background: var(--indigo-700); }
+
+    .btn-ghost{
+      background: var(--gray-100);
+      color: var(--gray-700);
+      padding:.85rem .9rem;
+    }
+    .btn-ghost:hover{ background: var(--gray-200); }
+
+    .results{
+      margin-top:1.5rem;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:1.5rem;
+    }
+    @media (max-width: 900px){
+      .results{ grid-template-columns: 1fr; }
+    }
+
+    .section-title{
+      font-size:1.05rem;
+      font-weight:800;
+      margin:0 0 .8rem 0;
+      padding-bottom:.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .result-card{
+      padding:.9rem;
+      border-radius:.7rem;
+      border:1px solid var(--gray-200);
+      background: var(--gray-50);
+      margin-bottom:.7rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04);
+      animation: fadeUp .25s ease;
+    }
+
+    .result-card h4{
+      margin:0 0 .25rem 0;
+      font-size:.8rem;
+      opacity:.7;
+      font-weight:700;
+    }
+
+    .result-card .value{
+      font-weight:800;
+      font-size:1.05rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+      direction:ltr;
+      text-align:left;
+    }
+
+    .bg-success{ background: var(--emerald-50); border-color: var(--emerald-200); color: var(--emerald-800); }
+    .bg-warning{ background: var(--amber-50); border-color: var(--amber-200); color: var(--amber-800); }
+    .bg-error{ background: var(--rose-50); border-color: var(--rose-200); color: var(--rose-800); }
+
+    .steps{
+      display:flex;
+      flex-direction:column;
+      gap:.6rem;
+    }
+
+    .step{
+      display:flex;
+      gap:.8rem;
+      align-items:flex-start;
+      color: var(--gray-700);
+      animation: slideIn .3s ease;
+    }
+
+    .step .num{
+      min-width:24px;
+      height:24px;
+      border-radius:999px;
+      background:#e0e7ff;
+      color:#3730a3;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:.75rem;
+      margin-top:.2rem;
+    }
+
+    .step .math{
+      margin-top:.35rem;
+      padding:.45rem;
+      background: var(--gray-50);
+      border:1px solid var(--gray-200);
+      border-radius:.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+      text-align:center;
+      direction:ltr;
+      font-size:.9rem;
+    }
+
+    .hidden{ display:none; }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(8px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+    @keyframes slideIn{
+      from{ opacity:0; transform: translateX(10px); }
+      to{ opacity:1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="card header">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+        <h1>
+          <span aria-hidden="true">🧮</span>
+          حل المعادلات
+        </h1>
+        <span class="badge">الرياضيات</span>
+      </div>
+      <p style="margin:.3rem 0 0 0; color: var(--gray-500);">
+        أداة لحل المعادلات من الدرجة الأولى والثانية مع توضيح الخطوات.
+      </p>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="mode-toggle">
+      <button id="mode-linear" class="mode-btn active" type="button">
+        الدرجة الأولى
+        <small>ax + b = 0</small>
+      </button>
+      <button id="mode-quadratic" class="mode-btn" type="button">
+        الدرجة الثانية
+        <small>ax² + bx + c = 0</small>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div class="card">
+      <div class="form-grid">
+        <div>
+          <label for="a">المعامل A</label>
+          <input id="a" name="a" type="text" placeholder="أدخل قيمة a" inputmode="decimal">
+        </div>
+        <div>
+          <label for="b">المعامل B</label>
+          <input id="b" name="b" type="text" placeholder="أدخل قيمة b" inputmode="decimal">
+        </div>
+        <div id="c-wrap">
+          <label for="c">المعامل C</label>
+          <input id="c" name="c" type="text" placeholder="أدخل قيمة c" inputmode="decimal">
+        </div>
+      </div>
+
+      <div id="error" class="error hidden">
+        <span aria-hidden="true">ℹ️</span>
+        <span id="error-text"></span>
+      </div>
+
+      <div class="actions">
+        <button id="solve" class="btn btn-primary" type="button">
+          حل المعادلة
+          <span aria-hidden="true">➤</span>
+        </button>
+        <button id="reset" class="btn btn-ghost" type="button" title="إعادة تعيين">
+          ⟲
+        </button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="results hidden">
+      <!-- Main Result -->
+      <div class="card">
+        <h3 class="section-title">النتيجة النهائية</h3>
+        <div id="result-cards"></div>
+      </div>
+
+      <!-- Steps -->
+      <div class="card">
+        <h3 class="section-title">خطوات الحل</h3>
+        <div id="steps" class="steps"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const modeLinearBtn = document.getElementById('mode-linear');
+      const modeQuadraticBtn = document.getElementById('mode-quadratic');
+      const aInput = document.getElementById('a');
+      const bInput = document.getElementById('b');
+      const cInput = document.getElementById('c');
+      const cWrap = document.getElementById('c-wrap');
+      const errorBox = document.getElementById('error');
+      const errorText = document.getElementById('error-text');
+      const results = document.getElementById('results');
+      const resultCards = document.getElementById('result-cards');
+      const stepsEl = document.getElementById('steps');
+      const solveBtn = document.getElementById('solve');
+      const resetBtn = document.getElementById('reset');
+
+      let mode = 'linear';
+
+      function setMode(newMode){
+        mode = newMode;
+        modeLinearBtn.classList.toggle('active', mode === 'linear');
+        modeQuadraticBtn.classList.toggle('active', mode === 'quadratic');
+        cWrap.style.display = (mode === 'quadratic') ? 'block' : 'none';
+        resetForm();
+      }
+
+      function resetForm(){
+        aInput.value = '';
+        bInput.value = '';
+        cInput.value = '';
+        hideError();
+        clearResults();
+      }
+
+      function showError(msg){
+        errorText.textContent = msg;
+        errorBox.classList.remove('hidden');
+      }
+      function hideError(){
+        errorBox.classList.add('hidden');
+        errorText.textContent = '';
+      }
+      function clearResults(){
+        results.classList.add('hidden');
+        resultCards.innerHTML = '';
+        stepsEl.innerHTML = '';
+      }
+
+      function isValidNumberInput(value){
+        return value === '' || /^-?\d*\.?\d*$/.test(value);
+      }
+
+      [aInput, bInput, cInput].forEach(inp => {
+        inp.addEventListener('input', (e) => {
+          if(!isValidNumberInput(e.target.value)){
+            e.target.value = e.target.value.slice(0, -1);
+            return;
+          }
+          hideError();
+          clearResults();
+        });
+      });
+
+      function formatNumber(n){
+        return Number.isInteger(n) ? String(n) : n.toFixed(4);
+      }
+
+      function addResultCard(title, value, type){
+        const card = document.createElement('div');
+        card.className = 'result-card' + (type ? ' ' + type : '');
+        card.innerHTML = `
+          <h4>${title}</h4>
+          <div class="value">${value}</div>
+        `;
+        resultCards.appendChild(card);
+      }
+
+      function addStep(text, math){
+        const idx = stepsEl.children.length + 1;
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.innerHTML = `
+          <div class="num">${idx}</div>
+          <div class="content">
+            <div>${text}</div>
+            ${math ? `<div class="math">${math}</div>` : ''}
+          </div>
+        `;
+        stepsEl.appendChild(step);
+      }
+
+      function solveLinear(){
+        const a = parseFloat(aInput.value);
+        const b = parseFloat(bInput.value);
+
+        if (isNaN(a) || isNaN(b)){
+          showError('الرجاء إدخال قيم صحيحة للمعاملات a و b');
+          return;
+        }
+
+        if (a === 0){
+          if (b === 0){
+            addResultCard('الحالة', '∞', '');
+            addStep('بما أن a = 0 و b = 0، فإن المعادلة صحيحة دائماً.', '0 = 0');
+          } else {
+            addResultCard('الحالة', 'Ø', 'bg-error');
+            addStep('بما أن a = 0 و b ≠ 0، فإن المعادلة مستحيلة.', `${b} = 0 (False)`);
+          }
+          return;
+        }
+
+        const x = -b / a;
+        const fx = formatNumber(x);
+
+        addResultCard('قيمة x', fx, 'bg-success');
+        addStep('المعادلة الأصلية:', `${a}x + (${b}) = 0`);
+        addStep('ننقل الثابت b إلى الطرف الآخر مع تغيير الإشارة:', `${a}x = ${-b}`);
+        addStep('نقسم الطرفين على المعامل a:', `x = ${-b} / ${a}`);
+        addStep('النتيجة النهائية:', `x = ${fx}`);
+      }
+
+      function solveQuadratic(){
+        const a = parseFloat(aInput.value);
+        const b = parseFloat(bInput.value);
+        const c = parseFloat(cInput.value);
+
+        if (isNaN(a) || isNaN(b) || isNaN(c)){
+          showError('الرجاء إدخال قيم صحيحة لجميع المعاملات');
+          return;
+        }
+
+        if (a === 0){
+          setMode('linear');
+          aInput.value = String(b);
+          bInput.value = String(c);
+          showError('بما أن معامل x² يساوي صفر، فقد تم تحويل المعادلة إلى خطية.');
+          return;
+        }
+
+        const delta = (b*b) - (4*a*c);
+
+        addStep('المعادلة التربيعية:', `${a}x² + (${b})x + (${c}) = 0`);
+        addStep('حساب المميز (Delta) باستخدام القانون:', `Δ = b² - 4ac`);
+        addStep('التعويض بالقيم:', `Δ = (${b})² - 4(${a})(${c})`);
+        addStep('قيمة المميز:', `Δ = ${delta}`);
+
+        addResultCard('المميز (Δ)', String(delta), '');
+
+        if (delta > 0){
+          const x1 = (-b - Math.sqrt(delta)) / (2*a);
+          const x2 = (-b + Math.sqrt(delta)) / (2*a);
+          const f1 = formatNumber(x1);
+          const f2 = formatNumber(x2);
+
+          addResultCard('x₁', f1, 'bg-success');
+          addResultCard('x₂', f2, 'bg-success');
+
+          addStep('بما أن المميز موجب (Δ > 0)، يوجد حلان حقيقيان مختلفان.');
+          addStep('القانون العام:', 'x = (-b ± √Δ) / 2a');
+          addStep('الحل الأول:', `x₁ = (${-b} - √${delta}) / ${2*a} = ${f1}`);
+          addStep('الحل الثاني:', `x₂ = (${-b} + √${delta}) / ${2*a} = ${f2}`);
+        } else if (delta === 0){
+          const x = -b / (2*a);
+          const fx = formatNumber(x);
+
+          addResultCard('x (حل مضاعف)', fx, 'bg-warning');
+
+          addStep('بما أن المميز يساوي صفر (Δ = 0)، يوجد حل حقيقي واحد (مكرر).');
+          addStep('القانون:', 'x = -b / 2a');
+          addStep('التعويض:', `x = ${-b} / ${2*a} = ${fx}`);
+        } else {
+          const realPart = (-b / (2*a)).toFixed(2);
+          const imaginaryPart = (Math.sqrt(Math.abs(delta)) / (2*a)).toFixed(2);
+
+          const note = document.createElement('div');
+          note.className = 'result-card';
+          note.style.textAlign = 'center';
+          note.style.color = 'var(--gray-500)';
+          note.textContent = 'لا توجد حلول حقيقية';
+          resultCards.appendChild(note);
+
+          addStep('بما أن المميز سالب (Δ < 0)، لا توجد حلول حقيقية (الحلول تخيلية).');
+          addStep('الحلول في مجموعة الأعداد المركبة:', `x = ${realPart} ± ${imaginaryPart}i`);
+        }
+      }
+
+      function handleSolve(){
+        hideError();
+        clearResults();
+        if (mode === 'linear') solveLinear();
+        else solveQuadratic();
+        if (resultCards.children.length || stepsEl.children.length){
+          results.classList.remove('hidden');
+        }
+      }
+
+      modeLinearBtn.addEventListener('click', () => setMode('linear'));
+      modeQuadraticBtn.addEventListener('click', () => setMode('quadratic'));
+      solveBtn.addEventListener('click', handleSolve);
+      resetBtn.addEventListener('click', resetForm);
+
+      // init
+      setMode('linear');
+    })();
+  </script>
+</body>
+</html>
